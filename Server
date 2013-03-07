@@ -1,0 +1,46 @@
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import urlparse, serial
+
+#Arduino Serial Communication
+ast = 0
+ard = serial.Serial("/dev/tty0", 9600)
+def ardWrite(pie):
+    ard.write(chr(pie))
+def atHome(cake) :
+    print("Writing to ardunio...")
+    if cake == '0':
+        #ardWrite(13)
+        ardWrite(0)
+    if cake == '1':
+        #ardWrite(13)
+        ardWrite(1)
+    if cake == '2':
+        ardWrite(2)
+    if cake == '3':
+        ardWrite(3)
+    if cake == '40':
+        ardWrite(40)
+    if cake == '99':
+        ardWrite(35)
+    print("Attempt Successful!")
+    print cake
+#HTTP Listener    
+class HTHandler(BaseHTTPRequestHandler):
+    def do_GET(jelly):
+        path = jelly.path
+        if '?mars' in path:
+            path, ast = path.split('mars=', 1)
+        jelly.wfile.write('State is ' + ast)
+        atHome(ast)   
+        #jelly.wfile.write('You\'re doing someting wrong.')
+        return
+
+if __name__ == "__main__":
+    try:
+        server = HTTPServer(('192.168.2.20', 80), HTHandler) #change this to your computers ip.
+        print('Ready to go!')
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print('Kill...')
+        server.socket.close()
+        ard.close()
